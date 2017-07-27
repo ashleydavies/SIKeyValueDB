@@ -36,7 +36,8 @@ namespace Snapshot_Isolation {
 
         public bool TryCommit(Transaction<TKey, TValue> transaction, Dictionary<TKey, TValue> updates) {
             // Don't allow a transaction to commit if it has been forged or contains a conflicting update
-            if (transaction.Updated(updates) &&
+            if (!transaction.Updated(updates) ||
+                !_openTransactionsCachedValueDictionary.ContainsKey(transaction) ||
                 updates.Keys.Intersect(_openTransactionsCachedValueDictionary[transaction].Keys).Any()) {
                 return false;
             }
